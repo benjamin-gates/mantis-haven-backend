@@ -10,6 +10,11 @@ async function create(req, res, next){
     res.status(200).json({data: await service.create(image)});
 }
 
+async function destroy(req, res, next){
+    const imageId = req.body.data;
+    await service.delete(imageId);
+    res.sendStatus(204);
+}
 module.exports = {
     list: asyncErrorBoundary(list),
     create: asyncErrorBoundary(create)
