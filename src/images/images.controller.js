@@ -11,11 +11,12 @@ async function create(req, res, next){
 }
 
 async function destroy(req, res, next){
-    const imageId = req.body.data;
+    const {imageId} = req.params;
     await service.delete(imageId);
     res.sendStatus(204);
 }
 module.exports = {
     list: asyncErrorBoundary(list),
-    create: asyncErrorBoundary(create)
+    create: asyncErrorBoundary(create),
+    delete: asyncErrorBoundary(destroy),
 }
