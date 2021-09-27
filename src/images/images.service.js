@@ -5,7 +5,7 @@ function list(){
 }
 
 function create(image){
-    return knex("images").insert(image).returning("*").then((createdRecords) => createdRecors[0]);
+    return knex("images").insert(image).returning("*").then((createdRecords) => createdRecords[0]);
 }
 
 function destroy(imageId){

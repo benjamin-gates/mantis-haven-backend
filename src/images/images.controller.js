@@ -1,6 +1,33 @@
 const service = require("./images.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
+// Middleware functions
+function bodyExists(req, res, next){
+    if(!req.body.data){
+        next({status: 400, message: "The body of the request must have a data property"});
+    }
+    else {
+        next();
+    }
+}
+
+function fieldsExist(req, res, next){
+    const image = req.body.data;
+    if(!image.caption){
+        next({status: 400, message: "A caption is required"});
+    } else if(!image.image_url){
+        next({status: 400, message: "An image_url is required"});
+    } else {
+        next();
+    }
+}
+
+/*function correctFormat(req, res, next){
+    const image = req.body.data;
+
+}*/
+
+// Services for the /images route
 async function list(req, res, next){
     res.status(200).json({data: await service.list()});
 }
@@ -10,6 +37,7 @@ async function create(req, res, next){
     res.status(200).json({data: await service.create(image)});
 }
 
+// Services for the /images/:imageId route
 async function destroy(req, res, next){
     const {imageId} = req.params;
     await service.delete(imageId);
@@ -17,6 +45,6 @@ async function destroy(req, res, next){
 }
 module.exports = {
     list: asyncErrorBoundary(list),
-    create: asyncErrorBoundary(create),
+    create: [bodyExists, fieldsExist, asyncErrorBoundary(create)],
     delete: asyncErrorBoundary(destroy),
 }
