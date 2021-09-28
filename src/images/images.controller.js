@@ -16,16 +16,21 @@ function fieldsExist(req, res, next){
     if(!image.caption){
         next({status: 400, message: "A caption is required"});
     } else if(!image.image_url){
-        next({status: 400, message: "An image_url is required"});
+        next({status: 400, message: "An image URL is required"});
     } else {
         next();
     }
 }
 
-/*function correctFormat(req, res, next){
+function correctFormat(req, res, next){
     const image = req.body.data;
+    if(image.image_url.substr(0, 18) !== "https://imgur.com/"){
+        next({status: 400, message: "The image URL must be in the correct format."})
+    } else {
+        next();
+    }
 
-}*/
+}
 
 // Services for the /images route
 async function list(req, res, next){
@@ -45,6 +50,6 @@ async function destroy(req, res, next){
 }
 module.exports = {
     list: asyncErrorBoundary(list),
-    create: [bodyExists, fieldsExist, asyncErrorBoundary(create)],
+    create: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(create)],
     delete: asyncErrorBoundary(destroy),
 }
