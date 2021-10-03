@@ -11,8 +11,14 @@ function create(image){
 function destroy(imageId){
     return knex("images").where({image_id: imageId}).del();
 }
+
+function updateImage(imageId, image){
+    return knex("images").where({image_id: imageId}).update({...image}).returning("*").then((createdRecords) => createdRecords[0]); 
+}
+
 module.exports = {
     list,
     create,
-    delete: destroy
+    delete: destroy,
+    updateImage
 }

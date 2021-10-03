@@ -48,8 +48,15 @@ async function destroy(req, res, next){
     await service.delete(imageId);
     res.sendStatus(204);
 }
+
+async function updateImage(req, res, next){
+    const {imageId} = req.params;
+    const image = req.body.data;
+    res.status(200).json({data: await service.updateImage(imageId, image)});
+}
 module.exports = {
     list: asyncErrorBoundary(list),
     create: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(create)],
     delete: asyncErrorBoundary(destroy),
+    edit: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(updateImage)]
 }
