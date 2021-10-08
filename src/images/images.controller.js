@@ -34,6 +34,7 @@ function correctFormat(req, res, next){
 
 // Services for the /images route
 async function list(req, res, next){
+    console.log('you called the list service!');
     res.status(200).json({data: await service.list()});
 }
 
