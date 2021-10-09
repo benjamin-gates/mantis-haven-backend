@@ -10,8 +10,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const imagesRouter = require("./images/images.router");
+const updatesRouter = require("./updates/updates.router");
 
 app.use("/images", imagesRouter);
+app.use("/updates", updatesRouter);
 app.use(notFound);
 app.use(errorHandler);
 
