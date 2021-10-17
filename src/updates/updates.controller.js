@@ -23,7 +23,6 @@ function fieldsExist(req, res, next){
 
 function correctFormat(req, res, next){
     const update = req.body.data;
-    //console.log('image_id', update.image_id, 'type', typeof update.image_id, 'exists', !update.image_id);
     if(update.image_id && typeof update.image_id !== "number"){
         next({status: 400, message: "The image_id must be a number"});
     } else {
@@ -33,8 +32,17 @@ function correctFormat(req, res, next){
 
 async function imageExists(req, res, next){
     const {image_id} = req.body.data;
+    if(!image_id){
+        next();
+    }
     const image = await service.readImage(image_id);
     !image ? next({status: 400, message: `The image_id, ${image_id}, does not exist`}) : next();
+}
+
+async function updateExists(req, res, next){
+    const {updateId} = req.params;
+    const update = await service.readUpdate(updateId);
+    !update ? next({ status: 400, message: `The update_id, ${update_id}, does not exist`}) : next();
 }
 /** 
  * Route Handlers
@@ -54,8 +62,15 @@ async function destroy(req, res, next){
     res.sendStatus(204);
 }
 
+async function edit(req, res, next){
+    const {updateId} = req.params;
+    const update = req.body.data;
+    res.status(200).json({data: await service.edit(updateId, update)});
+}
+
 module.exports = {
     list: asyncErrorBoundary(list),
     create: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(imageExists), asyncErrorBoundary(create)],
-    delete: asyncErrorBoundary(destroy)
+    delete: [asyncErrorBoundary(updateExists), asyncErrorBoundary(destroy)],
+    edit: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(updateExists), asyncErrorBoundary(imageExists), asyncErrorBoundary(edit)]
 }
