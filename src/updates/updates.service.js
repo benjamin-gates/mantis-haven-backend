@@ -8,7 +8,12 @@ function create(update){
     return knex("updates").insert(update).returning("*").then((createdRecords) => createdRecords[0]);
 }
 
+function readImage(imageId){
+    return knex("images").where({image_id: imageId}).first();
+}
+
 module.exports = {
     list,
-    create
+    create, 
+    readImage
 }
