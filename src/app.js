@@ -11,9 +11,10 @@ app.use(cors());
 app.use(express.json());
 const imagesRouter = require("./images/images.router");
 const updatesRouter = require("./updates/updates.router");
-
+const productsRouter = require("./products/products.router");
 app.use("/images", imagesRouter);
 app.use("/updates", updatesRouter);
+app.use("/products", productsRouter);
 app.use(notFound);
 app.use(errorHandler);
 
