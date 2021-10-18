@@ -16,9 +16,14 @@ function updateImage(imageId, image){
     return knex("images").where({image_id: imageId}).update({...image}).returning("*").then((createdRecords) => createdRecords[0]); 
 }
 
+function read(imageId){
+    return knex("images").where({image_id: imageId}).first();
+}
+
 module.exports = {
     list,
     create,
     delete: destroy,
-    updateImage
+    updateImage,
+    read
 }

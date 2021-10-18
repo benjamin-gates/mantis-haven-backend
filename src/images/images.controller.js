@@ -29,12 +29,17 @@ function correctFormat(req, res, next){
     } else {
         next();
     }
+}
 
+async function imageExists(req, res, next){
+    const {imageId} = req.params;
+    const image = await service.read(imageId);
+    !image ? next({status: 400, message: `The image_id, ${imageId}, does not exist`}) : next();
 }
 
 // Services for the /images route
 async function list(req, res, next){
-    console.log('you called the list service!');
+    //console.log('you called the list service!');
     res.status(200).json({data: await service.list()});
 }
 
@@ -58,6 +63,6 @@ async function updateImage(req, res, next){
 module.exports = {
     list: asyncErrorBoundary(list),
     create: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(create)],
-    delete: asyncErrorBoundary(destroy),
-    edit: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(updateImage)]
+    delete: [asyncErrorBoundary(imageExists), asyncErrorBoundary(destroy)],
+    edit: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(imageExists), asyncErrorBoundary(updateImage)]
 }
