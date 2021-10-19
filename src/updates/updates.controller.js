@@ -30,14 +30,20 @@ function correctFormat(req, res, next){
     }
 }
 
-async function imageExists(req, res, next){
-    const {image_id} = req.body.data;
-    if(!image_id){
-        next();
+async function imageExists(req, res, next) {
+    const { image_id } = req.body.data;
+    if (!image_id) {
+      next();
+    } else {
+      const image = await service.readImage(image_id);
+      !image
+        ? next({
+            status: 400,
+            message: `The image_id, ${image_id}, does not exist`,
+          })
+        : next();
     }
-    const image = await service.readImage(image_id);
-    !image ? next({status: 400, message: `The image_id, ${image_id}, does not exist`}) : next();
-}
+  }
 
 async function updateExists(req, res, next){
     const {updateId} = req.params;
