@@ -70,6 +70,12 @@ async function imageExists(req, res, next) {
   }
 }
 
+async function productExists(req, res, next){
+    const {productId} = req.params;
+    const product = await service.readProduct(productId);
+    !product ? next({status: 400, message: `The product with ID, ${productId}, does not exist`}) : next();
+}
+
 /**
  * Route handlers for all /products routes
  */
@@ -82,6 +88,11 @@ async function create(req, res, next) {
   res.status(200).json({ data: await service.create(product) });
 }
 
+async function destroy(req, res, next){
+    const {productId} = req.params;
+    await service.delete(productId);
+    res.sendStatus(204);
+}
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
@@ -91,4 +102,5 @@ module.exports = {
     asyncErrorBoundary(imageExists),
     asyncErrorBoundary(create),
   ],
+  delete: [asyncErrorBoundary(productExists), asyncErrorBoundary(destroy)]
 };

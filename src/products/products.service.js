@@ -12,8 +12,17 @@ function readImage(imageId){
     return knex("images").where({image_id: imageId}).first();
 }
 
+function destroy(productId){
+    return knex("products").where({product_id: productId}).del();
+}
+
+function readProduct(productId){
+    return knex("products").where({product_id: productId}).first();
+}
 module.exports = {
     list,
     create,
-    readImage
+    readImage,
+    delete: destroy,
+    readProduct
 }

@@ -4,4 +4,6 @@ const methodNotAllowed = require("../errors/methodNotAllowed");
 
 router.route("/").get(controller.list).post(controller.create).all(methodNotAllowed);
 
+router.route("/:productId").delete(controller.delete).all(methodNotAllowed);
+
 module.exports = router;
