@@ -93,6 +93,14 @@ async function destroy(req, res, next){
     await service.delete(productId);
     res.sendStatus(204);
 }
+
+async function edit(req, res, next){
+  const {productId} = req.params;
+  const product = req.body.data;
+  res.status(200).json({ data: await service.edit(productId, product)});
+}
+
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
@@ -102,5 +110,6 @@ module.exports = {
     asyncErrorBoundary(imageExists),
     asyncErrorBoundary(create),
   ],
-  delete: [asyncErrorBoundary(productExists), asyncErrorBoundary(destroy)]
+  delete: [asyncErrorBoundary(productExists), asyncErrorBoundary(destroy)],
+  edit: [bodyExists, fieldsExist, correctFormat, asyncErrorBoundary(imageExists), asyncErrorBoundary(edit)]
 };

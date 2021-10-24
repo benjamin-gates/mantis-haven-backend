@@ -19,10 +19,17 @@ function destroy(productId){
 function readProduct(productId){
     return knex("products").where({product_id: productId}).first();
 }
+
+function edit(productId, product){
+    return knex("products").where({product_id: productId}).update({...product}).returning("*").then((createdRecords) => createdRecords[0]);
+}
+
+
 module.exports = {
     list,
     create,
     readImage,
     delete: destroy,
-    readProduct
+    readProduct,
+    edit
 }
