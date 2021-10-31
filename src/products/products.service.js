@@ -1,7 +1,7 @@
 const knex = require("../db/connection");
 
 function list(){
-    return knex("products as p").leftJoin("images as i", "p.image_id", "i.image_id").select("p.*", "i.image_url");
+    return knex("products as p").leftJoin("images as i", "p.image_id", "i.image_id").select("p.*", "i.image_url").orderBy("p.product_name").orderBy("p.status");
 }
 
 function create(product){

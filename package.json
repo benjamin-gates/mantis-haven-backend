@@ -16,5 +16,8 @@
     "express": "^4.17.1",
     "knex": "^0.95.11",
     "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "cypress": "^8.7.0"
   }
 }
