@@ -8,7 +8,12 @@ function createUser(user){
     return knex("users").insert(user).returning("*").then((createdRecords) => createdRecords[0]);
 }
 
+function destroy(userId){
+    return knex("users").where({user_id: userId}).del();
+}
+
 module.exports = {
     read,
-    createUser
+    createUser,
+    delete: destroy
 }
