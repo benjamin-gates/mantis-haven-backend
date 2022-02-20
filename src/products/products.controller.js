@@ -4,6 +4,11 @@ const service = require("./products.service");
 /**
  * Middleware functions for all /products routes
  */
+ function loginRequired(req, res, next) {
+  if (!req.user) return res.status(401).json({status: 'Please log in'});
+  return next();
+}
+
 function bodyExists(req, res, next) {
   !req.body
     ? next({ status: 400, message: "A body is required for this request" })
@@ -104,6 +109,7 @@ async function edit(req, res, next){
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
+    loginRequired,
     bodyExists,
     fieldsExist,
     correctFormat,

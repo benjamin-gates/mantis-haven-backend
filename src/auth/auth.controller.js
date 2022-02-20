@@ -1,59 +1,77 @@
-const service = require("./auth.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const bcrypt = require("bcrypt");
+const passport = require("passport");
 
-function propertiesExist(req, res, next) {
-  if (!req.body.data) {
-    next({
-      status: 400,
-      message: "A data property is required for this request",
+// *** helpers *** //
+
+function handleLogin(req, user) {
+  return new Promise((resolve, reject) => {
+    req.login(user, (err) => {
+      if (err) reject(err);
+      resolve();
     });
-  } else if (!req.body.data.user_name) {
-    next({ status: 400, message: "A user name is required for this request" });
-  } else if (!req.body.data.password) {
-    next({ status: 400, message: "A password is required for this request" });
-  } else {
-    next();
-  }
+  });
 }
 
-async function userExists(req, res, next) {
-  const { user_name } = req.body.data;
-  const user = await service.readUser(user_name);
-  if (!user) {
-    next({
-      status: 400,
-      message: `The user name, ${user_name}, does not exist`,
-    });
-  } else {
-    res.locals.user = user;
-    next();
-  }
+function handleResponse(res, code, statusMsg) {
+  res.json({ status: code, message: statusMsg });
 }
 
-async function correctPassword(req, res, next) {
-  const { password } = req.body.data;
-  const user = res.locals.user;
-  const match = await bcrypt.compare(password, user.password);
-  if (match) {
-    next();
-  } else {
-    next({ status: 400, message: `Incorrect password.` });
-  }
+function loginRedirect(req, res, next) {
+  if (req.user)
+    return res.status(401).json({ status: "You are already logged in" });
+  return next();
 }
 
-function createSession(req, res, next) {
-  const { user_name, password } = req.body.data;
-  req.session.loggedin = true;
-  req.session.username = user_name;
-  res.sendStatus(200);
+function loginRequired(req, res, next) {
+  if (!req.user) return res.status(401).json({ status: "Please log in" });
+  return next();
+}
+
+function authenticateUser(req, res, next) {
+  passport.authenticate('local', (err, user) => {
+    if(err){
+      return next(err);
+    }
+
+    if(!user){
+      return next({ status: 401, message: "Invalid credentials" });
+    }
+    return req.login(user, { session: true }, (error) => {
+      if(error){
+        return next(error);
+      }
+      return next();
+    })
+  })(req, res, next);
+}
+
+function setCookie(req, res, next) {
+  // res.cookie('sessionID', req.session.id);
+  next();
+}
+
+function login(req, res, next){
+  // res.setHeader('Cookie', {sessionID: req.session.id});
+  // console.log('req.user', req.user);
+  res.cookie('user', 'req.user', {
+    maxAge: 600000,
+    httpOnly: true,
+    sameSite: true
+  });
+  res.json({message: 'cookie created'});
+}
+function logout(req, res, next) {
+  req.logout();
+  res.render("/");
+}
+
+function getLogin(req, res, next) {
+  res.render('login');
 }
 
 module.exports = {
-  validateUser: [
-    propertiesExist,
-    asyncErrorBoundary(userExists),
-    asyncErrorBoundary(correctPassword),
-    createSession,
-  ],
+  getLogin,
+  postLogin: [loginRedirect, authenticateUser, setCookie, login],
+  logout: [loginRequired, logout],
 };

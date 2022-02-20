@@ -4,6 +4,11 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 /**
  * Middleware Functions
  */
+ function loginRequired(req, res, next) {
+    if (!req.user) return res.status(401).json({status: 'Please log in'});
+    return next();
+  }
+
 function bodyExists(req, res, next){
     !req.body ? next({status: 400, message: "A body is required for this request"}) : next();
 }
